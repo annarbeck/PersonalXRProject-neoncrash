@@ -1,45 +1,94 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody playerRb;
-    private Animator playerAnim;
+    //private GameManager gameManager;
 
     //Movement settings
-    public float jumpForce = 7f;
-    public float fallMultiplier = 2f;
-    public float quickDropForce = 10f;
-    public float maxFallSpeed = -15f;
+    public float jumpForce = 12f;
+    public float fallMultiplier = 2.5f;
+    public float quickDropForce = 13f;
+
+    public bool isInvincible = false;
+    public float powerUpDuration = 5f;
+
+
+    public bool gameOver = false;
         
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
-        playerAnim = GetComponent<Animator>();
+        //gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         playerRb.useGravity = true;
+
+        // Freeze everything except Y movement
+        playerRb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //Jump up
-        if (Input.GetKeyDown(KeyCode.Space)) //&& !gameOver
+        //Up Input
+        if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
         {
-            playerRb.linearVelocity = new Vector3(playerRb.linearVelocity.x, 0, playerRb.linearVelocity.z);
+            playerRb.linearVelocity = new Vector3(0, 0, 0); //playerRb.linearVelocity.x, 0, playerRb.linearVelocity.z
             playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            // playerAnim.SetTrigger("Jump_trig");
         }
 
         //Quickly down
-        if (Input.GetKeyDown(KeyCode.DownArrow)) // && !gameOver
+        if (Input.GetKeyDown(KeyCode.DownArrow) && !gameOver)
         {
             playerRb.AddForce(Vector3.down * quickDropForce, ForceMode.Impulse);
         }
         
-        if (playerRb.linearVelocity.y < maxFallSpeed)
+        if (transform.position.y > 22f) 
         {
-            playerRb.linearVelocity = new Vector3(playerRb.linearVelocity.x, maxFallSpeed, playerRb.linearVelocity.z);
+            Debug.Log("Game Over!");
+            gameOver = true;
         }
+ 
+    }
+
+    private void OnCollisionEnter(Collision collision) 
+    {
+
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            gameOver = true;
+            Debug.Log("Game Over!");
+        } 
+            
+        if (collision.gameObject.CompareTag("Obstacle") && !isInvincible)
+        {
+            gameOver = true;
+            Debug.Log("Game Over!");
+        } else {
+            Debug.Log("Obstacle hit ignored (invincible!)");
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Powerup"))
+        {
+            Destroy(other.gameObject);
+            StartCoroutine(ActivatePowerUp());
+            
+        }
+    }
+
+    private IEnumerator ActivatePowerUp()
+    {
+        isInvincible = true;
+        Debug.Log("Power-Up Activated");
+
+        // Add visual feedback here (color, sounds, glow etc.)
+
+        yield return new WaitForSeconds(powerUpDuration);
+
+        isInvincible = false;
+        Debug.Log("Power-Up Ended");
     }
 }

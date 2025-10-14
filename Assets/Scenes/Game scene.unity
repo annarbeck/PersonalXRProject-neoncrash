@@ -363,7 +363,7 @@ GameObject:
   - component: {fileID: 420236007}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -588,10 +588,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnManager
   obstaclePrefab: {fileID: 1014865453947186680, guid: cd341fbde6c414d13bdc61f047e82115, type: 3}
+  powerUpPrefab: {fileID: 107744, guid: 0782c4fdae5f1624ba26300a1dc7a0a7, type: 3}
   groundY: 0
   topY: 20
-  minY: 10
-  maxY: 20
+  randomOffset: 2
 --- !u!4 &1245708651
 Transform:
   m_ObjectHideFlags: 0
@@ -871,10 +871,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f24054d4e6cc748bf9c10f16835875b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  jumpForce: 7
-  fallMultiplier: 2
-  quickDropForce: 10
-  maxFallSpeed: -15
+  jumpForce: 12
+  fallMultiplier: 2.5
+  quickDropForce: 13
+  isInvincible: 0
+  powerUpDuration: 5
+  gameOver: 0
 --- !u!54 &1975023622
 Rigidbody:
   m_ObjectHideFlags: 0

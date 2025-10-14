@@ -2,29 +2,45 @@ using UnityEngine;
 
 public class MoveLeft : MonoBehaviour
 {
-
+    // Movement variables
     private float speed = 30;
-    private PlayerController playerControllerScript;
-    //private float rightBound = -15;
+    private float leftBound = -20;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private PlayerController playerController;
+    private GameManager gameManager;
+
+    private int pointValue = 1;
+    private bool scored = false; // prevent multiple scoring
+
+
     void Start()
     {
-        playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
+        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //if (playerControllerScript.gameOver == false)
-        //{
+        // Move only if the game is not over
+        if (playerController.gameOver == false)
+        {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
-        //}
-        
-        /*if (transform.position.x < leftBound && gameObject.CompareTag("Obstacle"))
+        }
+
+        if (gameObject.CompareTag("Obstacle") && !scored && transform.position.x < playerController.transform.position.x) {
+            scored = true; // mark as scored
+            gameManager.UpdateScore(pointValue); // Increase score by 1
+        }
+
+        // Destroy obstacles and powerups that go off-screen
+        if (transform.position.x < leftBound && gameObject.CompareTag("Obstacle"))
         {
             Destroy(gameObject);
-        }*/
+        }
+
+        if (transform.position.x < leftBound && gameObject.CompareTag("Powerup")) {
+            Destroy(gameObject);
+        }
         
     }
 
