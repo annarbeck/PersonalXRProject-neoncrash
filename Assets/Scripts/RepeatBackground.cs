@@ -16,8 +16,6 @@ public class RepeatBackground : MonoBehaviour
     void Update()
     {
     if (transform.position.x < startPos.x - repeatWidth) {
-        
-            Debug.Log("Looper background: " + gameObject.name);
         transform.position += Vector3.right * repeatWidth;
     }
 
