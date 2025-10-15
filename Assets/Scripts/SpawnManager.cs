@@ -15,25 +15,44 @@ public class SpawnManager : MonoBehaviour
     private float repeatRate = 2f; 
 
     private float powerUpSpawnRate = 8f;
+
+    private float difficultyTimer = 0f;
+    private float difficultyInterval = 10f; // Every 10 seconds
+    private float minRepeatRate = 0.5f;
     
     private PlayerController playerControllerScript;
+    private GameManager gameManager;
 
     void Start()
     {
         InvokeRepeating("SpawnObstacle", startDelay, repeatRate);
         InvokeRepeating("SpawnPowerUp", startDelay + 1f, powerUpSpawnRate);
         playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     
     }
 
     void Update()
     {
+        if (!playerControllerScript.gameOver && gameManager.isGameActive)
+        {
+        difficultyTimer += Time.deltaTime;
+
+        if (difficultyTimer >= difficultyInterval && repeatRate > minRepeatRate)
+        {
+            repeatRate -= 0.2f;
+            difficultyTimer = 0f;
+
+            CancelInvoke("SpawnObstacle");
+            InvokeRepeating("SpawnObstacle", 0f, repeatRate);
+        }
+        }
         
     }
 
     void SpawnObstacle ()
     {
-       if (playerControllerScript.gameOver == false)
+       if (!playerControllerScript.gameOver && gameManager.isGameActive)
        {
          // Random choose top or bottom
          bool spawnFromTop = Random.value > 0.5f;
@@ -57,11 +76,13 @@ public class SpawnManager : MonoBehaviour
     }
 
     void SpawnPowerUp() {
-        if (playerControllerScript.gameOver == false)
+        if (!playerControllerScript.gameOver && gameManager.isGameActive)
         {
         float randomY = Random.Range(groundY + 1f, topY - 1f);
         Vector3 spawnPos = new Vector3(spawnX, randomY, 0);
+
         Instantiate(powerUpPrefab, spawnPos, Quaternion.identity); // ??
         }
     }
 }
+

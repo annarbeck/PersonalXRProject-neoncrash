@@ -1290,7 +1290,7 @@ MonoBehaviour:
   powerUpPrefab: {fileID: 107744, guid: 0782c4fdae5f1624ba26300a1dc7a0a7, type: 3}
   groundY: 0
   topY: 20
-  randomOffset: 2
+  randomOffset: 3
 --- !u!4 &1245708651
 Transform:
   m_ObjectHideFlags: 0
