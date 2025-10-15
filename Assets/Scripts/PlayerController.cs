@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody playerRb;
-    //private GameManager gameManager;
+    private GameManager gameManager;
 
     //Movement settings
     public float jumpForce = 12f;
@@ -20,9 +20,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
-        //gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-        playerRb.useGravity = true;
+        playerRb.useGravity = false;
 
         // Freeze everything except Y movement
         playerRb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
@@ -30,24 +30,38 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //Up Input
-        if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
+        // Start the game
+        if (!gameManager.isGameActive && Input.GetKeyDown(KeyCode.Space))
         {
-            playerRb.linearVelocity = new Vector3(0, 0, 0); //playerRb.linearVelocity.x, 0, playerRb.linearVelocity.z
-            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        gameManager.StartGame();
+        playerRb.useGravity = true;
+        return; // Don't process jump yet
         }
 
-        //Quickly down
-        if (Input.GetKeyDown(KeyCode.DownArrow) && !gameOver)
+        if (gameManager.isGameActive && !gameOver)
         {
+            if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
+            {
+            playerRb.linearVelocity = new Vector3(0, 0, 0); //playerRb.linearVelocity.x, 0, playerRb.linearVelocity.z
+            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            }
+
+            //Quickly down
+            if (Input.GetKeyDown(KeyCode.DownArrow) && !gameOver)
+            {
             playerRb.AddForce(Vector3.down * quickDropForce, ForceMode.Impulse);
-        }
+            }
         
-        if (transform.position.y > 22f) 
-        {
+            if (transform.position.y > 22f) 
+            {
             Debug.Log("Game Over!");
+            StartCoroutine(DeathSequence());
             gameOver = true;
+            }
+
+            
         }
+
  
     }
 
@@ -57,12 +71,14 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             gameOver = true;
+            StartCoroutine(DeathSequence());
             Debug.Log("Game Over!");
         } 
             
         if (collision.gameObject.CompareTag("Obstacle") && !isInvincible)
         {
             gameOver = true;
+            StartCoroutine(DeathSequence());
             Debug.Log("Game Over!");
         } else {
             Debug.Log("Obstacle hit ignored (invincible!)");
@@ -90,5 +106,18 @@ public class PlayerController : MonoBehaviour
 
         isInvincible = false;
         Debug.Log("Power-Up Ended");
+    }
+
+    IEnumerator DeathSequence()
+    {
+        // Disable player control
+        this.enabled = false;
+
+        // Maybe play particle, sound, or shrink animation
+        // Example: transform.DOScale(0, 0.5f);
+
+        yield return new WaitForSeconds(2f);
+
+        gameManager.GameOver();
     }
 }

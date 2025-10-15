@@ -22,7 +22,7 @@ public class MoveLeft : MonoBehaviour
     void Update()
     {
         // Move only if the game is not over
-        if (playerController.gameOver == false)
+        if (playerController.gameOver == false && gameManager.isGameActive == true)
         {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
         }

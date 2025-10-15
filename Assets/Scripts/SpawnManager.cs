@@ -9,10 +9,10 @@ public class SpawnManager : MonoBehaviour
     private float spawnX = 40f;  // Where obstacles spawn
     public float groundY = 0f; // Ground height
     public float topY = 22f; // Top height
-    public float randomOffset = 2f; // Variation near edges
+    public float randomOffset = 5f; // Variation near edges ??
 
     private float startDelay = 2f; 
-    private float repeatRate = 2f;
+    private float repeatRate = 2f; 
 
     private float powerUpSpawnRate = 8f;
     
@@ -61,7 +61,7 @@ public class SpawnManager : MonoBehaviour
         {
         float randomY = Random.Range(groundY + 1f, topY - 1f);
         Vector3 spawnPos = new Vector3(spawnX, randomY, 0);
-        Instantiate(powerUpPrefab, spawnPos, Quaternion.identity);
+        Instantiate(powerUpPrefab, spawnPos, Quaternion.identity); // ??
         }
     }
 }

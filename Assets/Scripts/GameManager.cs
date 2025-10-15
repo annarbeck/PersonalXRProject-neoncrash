@@ -9,6 +9,11 @@ public class GameManager : MonoBehaviour
 {
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI highScoreText;
+    public TextMeshProUGUI gameOverText;
+    public Button restartButton;
+    public GameObject titleScreen;
+
+    public bool isGameActive;
 
     private int score = 0;
     private int highScore = 0;
@@ -27,6 +32,14 @@ public class GameManager : MonoBehaviour
         
     }
 
+    public void StartGame() {
+        isGameActive = true;
+        
+        UpdateScore(0);
+        
+        titleScreen.gameObject.SetActive(false);
+    }
+
     public void UpdateScore(int scoreToAdd) {
         score += scoreToAdd;
         scoreText.text = "Score: " + score;
@@ -43,5 +56,21 @@ public class GameManager : MonoBehaviour
         if (highScoreText != null) {
             highScoreText.text = "High Score: " + highScore;
         }
+    }
+
+    public void GameOver() {
+        gameOverText.gameObject.SetActive(true);
+        isGameActive = false;
+
+        Invoke("ShowRestartButton", 2f);
+    }
+
+    private void ShowRestartButton()
+    {
+        restartButton.gameObject.SetActive(true);
+    }
+
+    public void RestartGame() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
