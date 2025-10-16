@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour
         gameOverText.gameObject.SetActive(true);
         isGameActive = false;
 
-        Invoke("ShowRestartButton", 2f);
+        Invoke("ShowRestartButton", 1.5f);
     }
 
     private void ShowRestartButton()
