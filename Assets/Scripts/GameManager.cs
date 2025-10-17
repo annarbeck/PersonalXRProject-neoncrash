@@ -7,44 +7,45 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    // UI elements
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI highScoreText;
     public TextMeshProUGUI gameOverText;
     public Button restartButton;
     public GameObject titleScreen;
 
+    // Game state
     public bool isGameActive;
 
+    // Score tracking
     private int score = 0;
     private int highScore = 0;
 
     void Start()
-    {
-        // PlayerPrefs.DeleteKey("HighScore"); // When I want to reset my highscore  
+    { 
         highScore = PlayerPrefs.GetInt("HighScore", 0);
         UpdateHighScoreText();
-        
+
+        // When i want to reset my highscore:
+        // PlayerPrefs.DeleteKey("HighScore");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void StartGame() 
     {
-        
-    }
-
-    public void StartGame() {
         isGameActive = true;
+        score = 0;
         
         UpdateScore(0);
-
         titleScreen.gameObject.SetActive(false);
-        
+        scoreText.gameObject.SetActive(true);
     }
 
-    public void UpdateScore(int scoreToAdd) {
+    public void UpdateScore(int scoreToAdd) 
+    {
         score += scoreToAdd;
         scoreText.text = "Score: " + score;
 
+        // Update high score if needed
         if (score > highScore)
         {
             highScore = score;
@@ -53,16 +54,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void UpdateHighScoreText() {
-        if (highScoreText != null) {
-            highScoreText.text = "High Score: " + highScore;
-        }
+    private void UpdateHighScoreText() 
+    {
+        highScoreText.text = "High Score: " + highScore;
     }
 
-    public void GameOver() {
-        gameOverText.gameObject.SetActive(true);
+    public void GameOver()
+    {
         isGameActive = false;
+        gameOverText.gameObject.SetActive(true);
 
+        // Delay showing restart button
         Invoke("ShowRestartButton", 1.5f);
     }
 
@@ -71,7 +73,9 @@ public class GameManager : MonoBehaviour
         restartButton.gameObject.SetActive(true);
     }
 
-    public void RestartGame() {
+    public void RestartGame()
+    {
+        // Reload scene 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

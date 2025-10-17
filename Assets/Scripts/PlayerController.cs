@@ -4,108 +4,110 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    // References
     private Rigidbody playerRb;
     private GameManager gameManager;
+    private AudioSource audioSource;
+
+    // Visual and Audio effects
     public ParticleSystem explosionParticle;
     public ParticleSystem playerParticle;
     public AudioClip crashSound;
+    public AudioClip powerupSound;
     public Camera mainCamera;
 
     //Movement settings
     public float jumpForce = 12f;
-    public float fallMultiplier = 2.5f;
     public float quickDropForce = 13f;
 
-    // Powerup settings
+    // Power-up settings
     public bool isInvincible = false;
     public float powerUpDuration = 5f;
     public GameObject Powerup;
     public Slider powerupProgressBar;
-    public AudioClip powerupSound;
 
     // Crash feedback setting
     public float shrinkDuration = 0.1f;
     public float cameraShakeIntensity = 0.2f;
     public float cameraShakeDuration = 0.2f;
-    public float slowMoDuration = 0.15f;
-    public float slowMoScale = 0.5f;
 
-    private AudioSource audioSource;
-
+    // Game state
     public bool gameOver = false;
         
     void Start()
     {
+        // Get references
         playerRb = GetComponent<Rigidbody>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         audioSource = GetComponent<AudioSource>();
-
+        
+        // Disable gravity until game starts
         playerRb.useGravity = false;
 
         // Freeze everything except Y movement
-        playerRb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
+        // playerRb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     }
 
     void Update()
     {
-        // Start the game
+        // Start game on spacebar press
         if (!gameManager.isGameActive && Input.GetKeyDown(KeyCode.Space))
         {
-        gameManager.StartGame();
+            gameManager.StartGame();
             playerRb.useGravity = true;
             playerParticle.Play();
         }
 
+        // Handle player input during game
         if (gameManager.isGameActive && !gameOver)
         {
-            if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-            playerRb.linearVelocity = new Vector3(0, 0, 0); 
-            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                playerRb.linearVelocity = Vector3.zero;  
+                playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             }
 
-            //Quickly down
-            if (Input.GetKeyDown(KeyCode.DownArrow) && !gameOver)
+            if (Input.GetKeyDown(KeyCode.DownArrow))
             {
-            playerRb.AddForce(Vector3.down * quickDropForce, ForceMode.Impulse);
+                playerRb.AddForce(Vector3.down * quickDropForce, ForceMode.Impulse);
             }
-        
+
+            // Game over if the player flies to the top of the screen
             if (transform.position.y > 22f) 
             {
-            Debug.Log("Game Over!");
-            StartCoroutine(DeathSequence());
-            gameOver = true;
+                Debug.Log("Game Over!");
+                StartCoroutine(DeathSequence());
+                gameOver = true;
             }
         }
     }
 
     private void OnCollisionEnter(Collision collision) 
     {
-
+        // End game if player hits ground
         if (collision.gameObject.CompareTag("Ground"))
         {
             gameOver = true;
             StartCoroutine(DeathSequence());
             Debug.Log("Game Over!");
         } 
-            
+
+        // End game if player hits obstacles and does not have an activated powerup    
         if (collision.gameObject.CompareTag("Obstacle") && !isInvincible)
         {
             gameOver = true;
             StartCoroutine(DeathSequence());
             Debug.Log("Game Over!");
-        } else {
-            Debug.Log("Obstacle hit ignored (invincible!)");
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        // Activate powerup on trigger
         if (other.CompareTag("Powerup"))
         {
             Destroy(other.gameObject);
             StartCoroutine(ActivatePowerUp());
-            
         }
     }
 
@@ -114,11 +116,13 @@ public class PlayerController : MonoBehaviour
         isInvincible = true;
         audioSource.PlayOneShot(powerupSound);
         Debug.Log("Power-Up Activated");
+
         Powerup.SetActive(true);
         powerupProgressBar.gameObject.SetActive(true);
 
         float elapsed = 0f;
 
+        // Update progressbar over time
         while (elapsed < powerUpDuration)
         {
             elapsed += Time.deltaTime;
@@ -126,6 +130,7 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
 
+        // End powerup
         powerupProgressBar.gameObject.SetActive(false);
         isInvincible = false;
         Powerup.SetActive(false);
@@ -136,17 +141,17 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator DeathSequence()
     {
-        // Stop flying particles
+        // Stop particle effect on the player
         playerParticle.Stop();
 
         // Disable player control
         this.enabled = false;
 
-        // Keeps the player object in place after explosion
+        // Freeze the player
         playerRb.linearVelocity = Vector3.zero;
         playerRb.useGravity = false;
 
-        // Makes the ball disappear when exploding 
+        // Shrink player 
         Vector3 startScale = transform.localScale;
         float t = 0f;
         while (t < shrinkDuration)
@@ -156,10 +161,8 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
 
-        // Explosion Particles
+        // Explosion and soun
         Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
-
-        // Crash sound
         audioSource.PlayOneShot(crashSound);
         Debug.Log("Crash Sound");
 

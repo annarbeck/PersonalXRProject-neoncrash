@@ -2,44 +2,48 @@ using UnityEngine;
 
 public class MoveLeft : MonoBehaviour
 {
-    // Movement variables
-    private float speed = 30;
-    private float leftBound = -20;
-
+    // References
     private PlayerController playerController;
     private GameManager gameManager;
 
-    private int pointValue = 1;
-    private bool scored = false; // prevent multiple scoring
+    // Movement settings
+    private float speed = 30;
+    private float leftBound = -20;
+
+    // Scoring settings
+    private int scoreValue = 1;
+    private bool hasScored = false;
 
 
     void Start()
     {
+        // Get references
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     void Update()
     {
-        // Move only if the game is not over
+        // Move left if game is active and not over
         if (playerController.gameOver == false && gameManager.isGameActive == true)
         {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
         }
 
-        if (gameObject.CompareTag("Obstacle") && !scored && transform.position.x < playerController.transform.position.x) {
-            scored = true; // mark as scored
-            gameManager.UpdateScore(pointValue); // Increase score by 1
+        // Score when obstacle passes player and hasn't scored yet
+        if (gameObject.CompareTag("Obstacle") && !hasScored && transform.position.x < playerController.transform.position.x) 
+        {
+            hasScored = true;
+            gameManager.UpdateScore(scoreValue); 
         }
 
         // Destroy obstacles and powerups that go off-screen
-        if (transform.position.x < leftBound && gameObject.CompareTag("Obstacle"))
+        if (transform.position.x < leftBound) //&& gameObject.CompareTag("Obstacle"))
         {
-            Destroy(gameObject);
-        }
-
-        if (transform.position.x < leftBound && gameObject.CompareTag("Powerup")) {
-            Destroy(gameObject);
+            if (gameObject.CompareTag("Obstacle") || gameObject.CompareTag("Powerup"))
+            {
+                Destroy(gameObject);
+            }
         }
         
     }
