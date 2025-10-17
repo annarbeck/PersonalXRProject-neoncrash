@@ -6,9 +6,10 @@ public class PlayerController : MonoBehaviour
 {
     private Rigidbody playerRb;
     private GameManager gameManager;
-    public GameObject explosionParticle; // assign you explosion particle prefab
-    public AudioClip crashSound; // assign in inspector
-    public Camera mainCamera; // optional: assign main camera
+    public ParticleSystem explosionParticle;
+    public ParticleSystem playerParticle;
+    public AudioClip crashSound;
+    public Camera mainCamera;
 
     //Movement settings
     public float jumpForce = 12f;
@@ -19,8 +20,8 @@ public class PlayerController : MonoBehaviour
     public bool isInvincible = false;
     public float powerUpDuration = 5f;
     public GameObject Powerup;
-    public Material playerMaterial;
     public Slider powerupProgressBar;
+    public AudioClip powerupSound;
 
     // Crash feedback setting
     public float shrinkDuration = 0.1f;
@@ -30,7 +31,6 @@ public class PlayerController : MonoBehaviour
     public float slowMoScale = 0.5f;
 
     private AudioSource audioSource;
-    private MeshRenderer meshRenderer;
 
     public bool gameOver = false;
         
@@ -39,7 +39,6 @@ public class PlayerController : MonoBehaviour
         playerRb = GetComponent<Rigidbody>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         audioSource = GetComponent<AudioSource>();
-        meshRenderer = GetComponent<MeshRenderer>();
 
         playerRb.useGravity = false;
 
@@ -53,15 +52,15 @@ public class PlayerController : MonoBehaviour
         if (!gameManager.isGameActive && Input.GetKeyDown(KeyCode.Space))
         {
         gameManager.StartGame();
-        playerRb.useGravity = true;
-        return; // Don't process jump yet
+            playerRb.useGravity = true;
+            playerParticle.Play();
         }
 
         if (gameManager.isGameActive && !gameOver)
         {
             if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
             {
-            playerRb.linearVelocity = new Vector3(0, 0, 0); //playerRb.linearVelocity.x, 0, playerRb.linearVelocity.z
+            playerRb.linearVelocity = new Vector3(0, 0, 0); 
             playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             }
 
@@ -113,9 +112,9 @@ public class PlayerController : MonoBehaviour
     private IEnumerator ActivatePowerUp()
     {
         isInvincible = true;
+        audioSource.PlayOneShot(powerupSound);
         Debug.Log("Power-Up Activated");
         Powerup.SetActive(true);
-
         powerupProgressBar.gameObject.SetActive(true);
 
         float elapsed = 0f;
@@ -137,6 +136,9 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator DeathSequence()
     {
+        // Stop flying particles
+        playerParticle.Stop();
+
         // Disable player control
         this.enabled = false;
 
@@ -154,30 +156,15 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
 
-        // Spawn Particle explosion
-        if (explosionParticle != null)
-        {
-            GameObject explosion = Instantiate(explosionParticle, transform.position, Quaternion.identity);
-            Destroy(explosion, 2f);
-        }
+        // Explosion Particles
+        Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
 
-        if (meshRenderer != null)
-        {
-            meshRenderer.enabled = false;
-        }
-
-        // Play sound
-        if (crashSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(crashSound);
-            Debug.Log("Crash Sound");
-        }
+        // Crash sound
+        audioSource.PlayOneShot(crashSound);
+        Debug.Log("Crash Sound");
 
         // Camera shake
-        if (mainCamera != null)
-        {
-            StartCoroutine(ShakeCamera(cameraShakeDuration, cameraShakeIntensity));
-        }
+        StartCoroutine(ShakeCamera(cameraShakeDuration, cameraShakeIntensity));
 
         yield return new WaitForSeconds(1f);
 

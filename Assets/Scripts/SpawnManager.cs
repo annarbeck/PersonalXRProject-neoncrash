@@ -9,10 +9,11 @@ public class SpawnManager : MonoBehaviour
     private float spawnX = 40f;  // Where obstacles spawn
     public float groundY = 0f; // Ground height
     public float topY = 22f; // Top height
-    public float randomOffset = 5f; // Variation near edges ??
+    public float randomOffset = 4f; // Variation obstacle position
 
-    private float startDelay = 2f; 
-    private float repeatRate = 2f; 
+    private float repeatRate = 2f;
+    private float obstacleSpawnTimer = 0f;
+    private float powerUpSpawnTimer = 0f;
 
     private float powerUpSpawnRate = 8f;
 
@@ -25,8 +26,8 @@ public class SpawnManager : MonoBehaviour
 
     void Start()
     {
-        InvokeRepeating("SpawnObstacle", startDelay, repeatRate);
-        InvokeRepeating("SpawnPowerUp", startDelay + 1f, powerUpSpawnRate);
+        // InvokeRepeating("SpawnObstacle", startDelay, repeatRate);
+        // InvokeRepeating("SpawnPowerUp", startDelay + 1f, powerUpSpawnRate);
         playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     
@@ -34,21 +35,35 @@ public class SpawnManager : MonoBehaviour
 
     void Update()
     {
-        if (!playerControllerScript.gameOver && gameManager.isGameActive)
-        {
-        difficultyTimer += Time.deltaTime;
 
+    if (!playerControllerScript.gameOver && gameManager.isGameActive)
+    {
+        // Handle obstacle spawn
+        obstacleSpawnTimer += Time.deltaTime;
+        if (obstacleSpawnTimer >= repeatRate)
+        {
+            SpawnObstacle();
+            obstacleSpawnTimer = 0f;
+        }
+
+        // Handle power-up spawn
+        powerUpSpawnTimer += Time.deltaTime;
+        if (powerUpSpawnTimer >= powerUpSpawnRate)
+        {
+            SpawnPowerUp();
+            powerUpSpawnTimer = 0f;
+        }
+
+        // Handle difficulty scaling
+        difficultyTimer += Time.deltaTime;
         if (difficultyTimer >= difficultyInterval && repeatRate > minRepeatRate)
         {
             repeatRate -= 0.2f;
             difficultyTimer = 0f;
-
-            CancelInvoke("SpawnObstacle");
-            InvokeRepeating("SpawnObstacle", 0f, repeatRate);
         }
+    }
         }
         
-    }
 
     void SpawnObstacle ()
     {
