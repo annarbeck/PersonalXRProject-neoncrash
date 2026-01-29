@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class PlayerController : MonoBehaviour
     private Rigidbody playerRb;
     private GameManager gameManager;
     private AudioSource audioSource;
+    public InputActionReference startActionReference; 
+    public InputActionReference jumpActionReference; 
+    public InputActionReference dropActionReference;
 
     // Visual and Audio effects
     public ParticleSystem explosionParticle;
@@ -51,7 +55,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // Start game on spacebar press
-        if (!gameManager.isGameActive && Input.GetKeyDown(KeyCode.Space))
+        if (!gameManager.isGameActive && startActionReference.action.WasPressedThisFrame()) // Input.GetKeyDown(KeyCode.Space))
         {
             gameManager.StartGame();
             playerRb.useGravity = true;
@@ -61,19 +65,19 @@ public class PlayerController : MonoBehaviour
         // Handle player input during game
         if (gameManager.isGameActive && !gameOver)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if(jumpActionReference.action.WasPressedThisFrame()) // if (Input.GetKeyDown(KeyCode.Space))
             {
-                playerRb.linearVelocity = Vector3.zero;  
+                playerRb.linearVelocity = Vector3.zero;
                 playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             }
 
-            if (Input.GetKeyDown(KeyCode.DownArrow))
+            if(dropActionReference.action.WasPressedThisFrame()) //if (Input.GetKeyDown(KeyCode.DownArrow))
             {
                 playerRb.AddForce(Vector3.down * quickDropForce, ForceMode.Impulse);
             }
 
             // Game over if the player flies to the top of the screen
-            if (transform.position.y > 22f) 
+            if (transform.position.y > 22f)
             {
                 Debug.Log("Game Over!");
                 StartCoroutine(DeathSequence());
@@ -81,6 +85,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    
 
     private void OnCollisionEnter(Collision collision) 
     {
