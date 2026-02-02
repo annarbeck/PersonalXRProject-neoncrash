@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem playerParticle;
     public AudioClip crashSound;
     public AudioClip powerupSound;
-    public Camera mainCamera;
+    // public Camera mainCamera;
 
     //Movement settings
     public float jumpForce = 12f;
@@ -172,13 +172,14 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Crash Sound");
 
         // Camera shake
-        StartCoroutine(ShakeCamera(cameraShakeDuration, cameraShakeIntensity));
+        // StartCoroutine(ShakeCamera(cameraShakeDuration, cameraShakeIntensity));
 
         yield return new WaitForSeconds(1f);
 
         gameManager.GameOver();
     }
 
+/*
     private IEnumerator ShakeCamera(float duration, float magnitude)
     {
         Vector3 originalPos = mainCamera.transform.localPosition;
@@ -195,5 +196,5 @@ public class PlayerController : MonoBehaviour
         }
 
         mainCamera.transform.localPosition = originalPos;
-    }
+    }*/
 }
