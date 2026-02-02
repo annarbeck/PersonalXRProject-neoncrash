@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Game scene.unity
     guid: 232144822763343b89bed9519df9a1cb
   m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: db1859eb825c444baa00132f47fd7e7f, type: 3}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: c348712bda248c246b8c49b3db54643f, type: 3}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 42dc7f9fd65d9493ca8ba810f4dfe58d, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 6f15b294dc32f4c7ab645c5d7813108b, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 2256c6269f778428da58771c202c5653, type: 2}
