@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class PlayerController : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem playerParticle;
     public AudioClip crashSound;
     public AudioClip powerupSound;
-    // public Camera mainCamera;
 
     //Movement settings
     public float jumpForce = 12f;
@@ -37,25 +37,22 @@ public class PlayerController : MonoBehaviour
 
     // Game state
     public bool gameOver = false;
-        
+
     void Start()
     {
         // Get references
         playerRb = GetComponent<Rigidbody>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         audioSource = GetComponent<AudioSource>();
-        
+
         // Disable gravity until game starts
         playerRb.useGravity = false;
-
-        // Freeze everything except Y movement
-        // playerRb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
     }
 
     void Update()
     {
         // Start game on spacebar press
-        if (!gameManager.isGameActive && startActionReference.action.WasPressedThisFrame()) // Input.GetKeyDown(KeyCode.Space))
+        if (!gameManager.isGameActive && startActionReference.action.triggered) // Input.GetKeyDown(KeyCode.Space))
         {
             gameManager.StartGame();
             playerRb.useGravity = true;
@@ -65,15 +62,17 @@ public class PlayerController : MonoBehaviour
         // Handle player input during game
         if (gameManager.isGameActive && !gameOver)
         {
-            if(jumpActionReference.action.WasPressedThisFrame()) // if (Input.GetKeyDown(KeyCode.Space))
+            if(jumpActionReference.action.triggered) // if (Input.GetKeyDown(KeyCode.Space))
             {
                 playerRb.linearVelocity = Vector3.zero;
                 playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                SendHaptics(0.3f, 0.05f); 
             }
 
-            if(dropActionReference.action.WasPressedThisFrame()) //if (Input.GetKeyDown(KeyCode.DownArrow))
+            if(dropActionReference.action.triggered) //if (Input.GetKeyDown(KeyCode.DownArrow))
             {
                 playerRb.AddForce(Vector3.down * quickDropForce, ForceMode.Impulse);
+                SendHaptics(0.2f, 0.05f);
             }
 
             // Game over if the player flies to the top of the screen
@@ -120,6 +119,7 @@ public class PlayerController : MonoBehaviour
     {
         isInvincible = true;
         audioSource.PlayOneShot(powerupSound);
+        SendHaptics(0.5f, 0.1f);
         Debug.Log("Power-Up Activated");
 
         Powerup.SetActive(true);
@@ -166,35 +166,26 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
 
-        // Explosion and soun
+        // Explosion and sound
         Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
         audioSource.PlayOneShot(crashSound);
-        Debug.Log("Crash Sound");
-
-        // Camera shake
-        // StartCoroutine(ShakeCamera(cameraShakeDuration, cameraShakeIntensity));
+        SendHaptics(0.8f, 0.2f);
+        Debug.Log("Crash");
 
         yield return new WaitForSeconds(1f);
 
         gameManager.GameOver();
     }
 
-/*
-    private IEnumerator ShakeCamera(float duration, float magnitude)
-    {
-        Vector3 originalPos = mainCamera.transform.localPosition;
-        float elapsed = 0f;
+    private void SendHaptics(float amplitude, float duration) {
+        // Try both controllers (left and right) 
+        var left = GameObject.Find("LeftHand Controller")?.GetComponent<ActionBasedController>();
+        var right = GameObject.Find("RightHand Controller")?.GetComponent<ActionBasedController>();
 
-        while (elapsed < duration)
-        {
-            float x = Random.Range(-1f, 1f) * magnitude;
-            float y = Random.Range(-1f, 1f) * magnitude;
+        if (left != null)
+            left.SendHapticImpulse(amplitude, duration); 
+        
+        if (right != null) 
+            right.SendHapticImpulse(amplitude, duration); }
 
-            mainCamera.transform.localPosition = originalPos + new Vector3(x, y, 0);
-            elapsed += Time.unscaledDeltaTime;
-            yield return null;
-        }
-
-        mainCamera.transform.localPosition = originalPos;
-    }*/
 }

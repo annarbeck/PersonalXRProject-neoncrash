@@ -12,7 +12,6 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI highScoreText;
     public TextMeshProUGUI gameOverText;
     public Button restartButton;
-    public GameObject titleScreen;
 
     // Game state
     public bool isGameActive;
@@ -36,7 +35,6 @@ public class GameManager : MonoBehaviour
         score = 0;
         
         UpdateScore(0);
-        titleScreen.gameObject.SetActive(false);
         scoreText.gameObject.SetActive(true);
     }
 

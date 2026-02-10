@@ -350,7 +350,7 @@
                     "name": "Is Tracked",
                     "type": "Button",
                     "id": "82eb6741-beef-48d3-83ab-a957dc1caa1e",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -880,9 +880,9 @@
                 },
                 {
                     "name": "Select Value",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "e6005f29-e4c1-4f3b-8bf7-3a28bab5ca9c",
-                    "expectedControlType": "Axis",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -897,7 +897,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Activate Value",
+                    "name": "Start",
                     "type": "Value",
                     "id": "0c3d0ec9-85a1-45b3-839b-1ca43f859ecd",
                     "expectedControlType": "Axis",
@@ -1118,7 +1118,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Activate Value",
+                    "action": "Start",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1972,30 +1972,30 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Select Value",
-                    "type": "Value",
+                    "name": "Dropdown",
+                    "type": "Button",
                     "id": "39bbf1ac-21a3-413d-90f6-6dbf6efeaabe",
-                    "expectedControlType": "Axis",
+                    "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press",
                     "initialStateCheck": true
                 },
                 {
                     "name": "Activate",
                     "type": "Button",
                     "id": "41976d89-60de-4deb-bff9-16b4af96b290",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Activate Value",
-                    "type": "Value",
+                    "name": "Jump",
+                    "type": "Button",
                     "id": "c3ca6ed7-3d25-44a2-b1d8-5be4eb699370",
-                    "expectedControlType": "Axis",
+                    "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press",
                     "initialStateCheck": true
                 },
                 {
@@ -2145,7 +2145,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Select Value",
+                    "action": "Dropdown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2156,7 +2156,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Select Value",
+                    "action": "Dropdown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2167,7 +2167,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Select Value",
+                    "action": "Dropdown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2178,7 +2178,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Select Value",
+                    "action": "Dropdown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2189,7 +2189,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Select Value",
+                    "action": "Dropdown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2211,7 +2211,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Activate Value",
+                    "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
