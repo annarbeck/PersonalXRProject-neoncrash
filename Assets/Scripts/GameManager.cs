@@ -12,9 +12,12 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI highScoreText;
     public TextMeshProUGUI gameOverText;
     public Button restartButton;
+    public GameObject pauseMenu; // Assign your pause panel here 
+    public Button resumeButton; // Optional: hook up a resume button
 
     // Game state
     public bool isGameActive;
+    public bool isPaused; 
 
     // Score tracking
     private int score = 0;
@@ -27,6 +30,12 @@ public class GameManager : MonoBehaviour
 
         // When i want to reset my highscore:
         // PlayerPrefs.DeleteKey("HighScore");
+
+        // Hide pause menu at start 
+        if (pauseMenu != null)
+        {
+            pauseMenu.SetActive(false);
+        }
     }
 
     public void StartGame() 
@@ -76,4 +85,32 @@ public class GameManager : MonoBehaviour
         // Reload scene 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
+    // PAUSE SYSTEM  
+    public void PauseGame()
+    {
+        if (!isGameActive || isPaused)
+            return;
+
+        isPaused = true;
+        Time.timeScale = 0f;
+
+        if (pauseMenu != null)
+            pauseMenu.SetActive(true);
+
+        Debug.Log("Game Paused");
+    } 
+        
+        public void ResumeGame() {
+        if (!isPaused)
+            return;
+
+        isPaused = false;
+        Time.timeScale = 1f;
+
+        if (pauseMenu != null)
+            pauseMenu.SetActive(false);
+            
+        Debug.Log("Game Resumed"); 
+            }
 }

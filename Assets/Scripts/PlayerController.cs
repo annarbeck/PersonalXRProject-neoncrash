@@ -62,17 +62,17 @@ public class PlayerController : MonoBehaviour
         // Handle player input during game
         if (gameManager.isGameActive && !gameOver)
         {
-            if(jumpActionReference.action.triggered) // if (Input.GetKeyDown(KeyCode.Space))
+            if (jumpActionReference.action.triggered) // if (Input.GetKeyDown(KeyCode.Space))
             {
                 playerRb.linearVelocity = Vector3.zero;
                 playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-                SendHaptics(0.3f, 0.05f); 
+                //SendHaptics(0.3f, 0.05f);
             }
 
-            if(dropActionReference.action.triggered) //if (Input.GetKeyDown(KeyCode.DownArrow))
+            if (dropActionReference.action.triggered) //if (Input.GetKeyDown(KeyCode.DownArrow))
             {
                 playerRb.AddForce(Vector3.down * quickDropForce, ForceMode.Impulse);
-                SendHaptics(0.2f, 0.05f);
+                //SendHaptics(0.2f, 0.05f);
             }
 
             // Game over if the player flies to the top of the screen
@@ -83,6 +83,10 @@ public class PlayerController : MonoBehaviour
                 gameOver = true;
             }
         }
+
+        if (gameManager.isPaused)
+            return; 
+        
     }
     
 
@@ -115,11 +119,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private IEnumerator ActivatePowerUp()
+    public IEnumerator ActivatePowerUp()
     {
         isInvincible = true;
         audioSource.PlayOneShot(powerupSound);
-        SendHaptics(0.5f, 0.1f);
+        //SendHaptics(0.5f, 0.1f);
         Debug.Log("Power-Up Activated");
 
         Powerup.SetActive(true);
@@ -169,7 +173,8 @@ public class PlayerController : MonoBehaviour
         // Explosion and sound
         Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
         audioSource.PlayOneShot(crashSound);
-        SendHaptics(0.8f, 0.2f);
+        FindAnyObjectByType<WebSocketClient>()?.SendCrash();
+        //SendHaptics(0.8f, 0.2f);
         Debug.Log("Crash");
 
         yield return new WaitForSeconds(1f);
@@ -177,15 +182,18 @@ public class PlayerController : MonoBehaviour
         gameManager.GameOver();
     }
 
-    private void SendHaptics(float amplitude, float duration) {
+/*
+    private void SendHaptics(float amplitude, float duration)
+    {
         // Try both controllers (left and right) 
-        var left = GameObject.Find("LeftHand Controller")?.GetComponent<ActionBasedController>();
-        var right = GameObject.Find("RightHand Controller")?.GetComponent<ActionBasedController>();
+        var left = GameObject.Find("LeftHand Controller")?.GetComponent<XRBaseController>();
+        var right = GameObject.Find("RightHand Controller")?.GetComponent<XRBaseController>();
 
         if (left != null)
-            left.SendHapticImpulse(amplitude, duration); 
-        
-        if (right != null) 
-            right.SendHapticImpulse(amplitude, duration); }
+            left.SendHapticImpulse(amplitude, duration);
 
+        if (right != null)
+            right.SendHapticImpulse(amplitude, duration);
+    }
+*/
 }
