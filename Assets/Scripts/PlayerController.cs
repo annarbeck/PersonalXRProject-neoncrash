@@ -32,8 +32,8 @@ public class PlayerController : MonoBehaviour
 
     // Crash feedback setting
     public float shrinkDuration = 0.1f;
-    public float cameraShakeIntensity = 0.2f;
-    public float cameraShakeDuration = 0.2f;
+    // public float cameraShakeIntensity = 0.2f;
+    // public float cameraShakeDuration = 0.2f;
 
     // Game state
     public bool gameOver = false;
