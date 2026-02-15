@@ -7,6 +7,7 @@ TagManager:
   - Obstacle
   - Ground
   - Powerup
+  - CubeEnvironment
   layers:
   - Default
   - TransparentFX

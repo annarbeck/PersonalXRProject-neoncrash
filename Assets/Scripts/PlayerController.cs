@@ -10,7 +10,8 @@ public class PlayerController : MonoBehaviour
     private Rigidbody playerRb;
     private GameManager gameManager;
     private AudioSource audioSource;
-    public InputActionReference startActionReference; 
+
+    // public InputActionReference startActionReference; 
     public InputActionReference jumpActionReference; 
     public InputActionReference dropActionReference;
 
@@ -32,11 +33,13 @@ public class PlayerController : MonoBehaviour
 
     // Crash feedback setting
     public float shrinkDuration = 0.1f;
-    // public float cameraShakeIntensity = 0.2f;
-    // public float cameraShakeDuration = 0.2f;
 
     // Game state
     public bool gameOver = false;
+
+    public GameObject startOrb; // drag your orb here 
+    public float startDelay = 0.5f; // delay before game starts 
+    public float fadeDuration = 0.5f;
 
     void Start()
     {
@@ -51,13 +54,13 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // Start game on spacebar press
-        if (!gameManager.isGameActive && startActionReference.action.triggered) // Input.GetKeyDown(KeyCode.Space))
+        // Start game on left trigger
+        /*if (!gameManager.isGameActive && startActionReference.action.triggered) // Input.GetKeyDown(KeyCode.Space))
         {
             gameManager.StartGame();
             playerRb.useGravity = true;
             playerParticle.Play();
-        }
+        }*/
 
         // Handle player input during game
         if (gameManager.isGameActive && !gameOver)
@@ -85,15 +88,77 @@ public class PlayerController : MonoBehaviour
         }
 
         if (gameManager.isPaused)
-            return; 
-        
+            return;
+
     }
-    
+
+    public void ActivateStartOrb()
+{
+    if (!gameManager.isGameActive)
+    {
+        StartCoroutine(FadeAndStart());
+    }
+}
+
+private IEnumerator FadeAndStart()
+{
+    // Fade the orb
+    Renderer orbRenderer = startOrb.GetComponent<Renderer>();
+    Material mat = orbRenderer.material;
+    Color startColor = mat.color;
+
+    float t = 0f;
+    while (t < fadeDuration)
+    {
+        t += Time.deltaTime;
+        float alpha = Mathf.Lerp(1f, 0f, t / fadeDuration);
+
+        Color c = startColor;
+        c.a = alpha;
+        mat.color = c;
+
+        yield return null;
+    }
+
+    // Disable orb
+    startOrb.SetActive(false);
+
+    // Wait before starting game
+    yield return new WaitForSeconds(startDelay);
+
+    // Start game
+    gameManager.StartGame();
+    playerRb.useGravity = true;
+    playerParticle.Play();
+}
+/*
+
+    public void ActivateStartOrb()
+    {
+        if (!gameManager.isGameActive)
+        {
+            //gameManager.StartGame();
+            //playerRb.useGravity = true;
+            //playerParticle.Play();
+            orbFade.FadeAndDisable();   // fade the orb
+            StartCoroutine(StartGameDelayed());
+        }
+    }
+
+    private IEnumerator StartGameDelayed()
+    {
+        yield return new WaitForSeconds(0.5f); // delay matches fade
+
+        gameManager.StartGame();
+        playerRb.useGravity = true;
+        playerParticle.Play();
+}
+    */
 
     private void OnCollisionEnter(Collision collision) 
     {
         // End game if player hits ground
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("CubeEnvironment"))
         {
             gameOver = true;
             StartCoroutine(DeathSequence());
@@ -145,8 +210,6 @@ public class PlayerController : MonoBehaviour
         Powerup.SetActive(false);
         Debug.Log("Power-Up Ended");
     }
-
-
 
     IEnumerator DeathSequence()
     {
