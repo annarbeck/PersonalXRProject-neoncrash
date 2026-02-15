@@ -1,43 +1,44 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using System.Collections;
-using UnityEngine.UI;
 
 public class StartOrb : MonoBehaviour
 {
-    private GameManager gameManager;
-    //public ParticleSystem burstEffect;
-    //public AudioSource popSound;
+    //    [Header("Hover Feedback")]
+    public float scaleMultiplier = 1.15f;
+    public float transitionSpeed = 8f;
 
+    private Vector3 originalScale;
+    private bool isHovered = false;
 
     void Start()
     {
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        originalScale = transform.localScale;
     }
 
+
+    // Update is called once per frame
     void Update()
     {
-        transform.localPosition += Vector3.up * Mathf.Sin(Time.time * 2f) * 0.0005f; 
+        // Floating motion
+        transform.localPosition += Vector3.up * Mathf.Sin(Time.time * 2f) * 0.0005f;
+
+        // Slow rotation
         transform.Rotate(0, 30f * Time.deltaTime, 0);
+
+        // Hover Visual Feedback
+        Vector3 targetScale = isHovered ? originalScale * scaleMultiplier : originalScale;
+        transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * transitionSpeed);
     }
 
-        public void OnOrbActivated()
+    // Called by XR Simple Interactable
+    public void OnHoverEnter(HoverEnterEventArgs args)
     {
-        if (gameManager.isGameActive)
-            return;
+        isHovered = true;
+    }
 
-        // Optional effects
-        //if (burstEffect != null) burstEffect.Play();
-        //if (popSound != null) popSound.Play();
-
-        // Hide the orb
-        gameObject.SetActive(false);
-
-        // Start the game
-        gameManager.StartGame();
+    public void OnHoverExit(HoverExitEventArgs args)
+    {
+        isHovered = false;
     }
 }
-
-
-
 

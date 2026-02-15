@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
         gameOverPanel.SetActive(true);
 
         // Delay showing restart button
-        Invoke("ShowRestartButton", 1.5f);
+        Invoke("ShowRestartButton", 1f);
     }
 
     private void ShowRestartButton()

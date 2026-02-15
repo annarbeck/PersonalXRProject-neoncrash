@@ -10,8 +10,8 @@ public class PlayerController : MonoBehaviour
     private Rigidbody playerRb;
     private GameManager gameManager;
     private AudioSource audioSource;
+    public AudioSource startOrbAudio;
 
-    // public InputActionReference startActionReference; 
     public InputActionReference jumpActionReference; 
     public InputActionReference dropActionReference;
 
@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem playerParticle;
     public AudioClip crashSound;
     public AudioClip powerupSound;
+    public AudioClip startSound;
 
     //Movement settings
     public float jumpForce = 12f;
@@ -54,28 +55,18 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // Start game on left trigger
-        /*if (!gameManager.isGameActive && startActionReference.action.triggered) // Input.GetKeyDown(KeyCode.Space))
-        {
-            gameManager.StartGame();
-            playerRb.useGravity = true;
-            playerParticle.Play();
-        }*/
-
         // Handle player input during game
         if (gameManager.isGameActive && !gameOver)
         {
-            if (jumpActionReference.action.triggered) // if (Input.GetKeyDown(KeyCode.Space))
+            if (jumpActionReference.action.triggered)
             {
                 playerRb.linearVelocity = Vector3.zero;
                 playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-                //SendHaptics(0.3f, 0.05f);
             }
 
-            if (dropActionReference.action.triggered) //if (Input.GetKeyDown(KeyCode.DownArrow))
+            if (dropActionReference.action.triggered)
             {
                 playerRb.AddForce(Vector3.down * quickDropForce, ForceMode.Impulse);
-                //SendHaptics(0.2f, 0.05f);
             }
 
             // Game over if the player flies to the top of the screen
@@ -93,30 +84,31 @@ public class PlayerController : MonoBehaviour
     }
 
     public void ActivateStartOrb()
-{
-    if (!gameManager.isGameActive)
     {
-        StartCoroutine(FadeAndStart());
+        if (!gameManager.isGameActive)
+        {
+            startOrbAudio.clip = startSound;
+
+            startOrbAudio.pitch = 0.8f;
+            startOrbAudio.volume = 0.5f;
+
+            startOrbAudio.Play();
+
+            StartCoroutine(FadeAndStart());
+        }
     }
-}
 
-private IEnumerator FadeAndStart()
+    
+    private IEnumerator FadeAndStart()
 {
-    // Fade the orb
-    Renderer orbRenderer = startOrb.GetComponent<Renderer>();
-    Material mat = orbRenderer.material;
-    Color startColor = mat.color;
-
+    // Shrink the orb instead of fading
+    Vector3 startScale = startOrb.transform.localScale;
     float t = 0f;
+
     while (t < fadeDuration)
     {
         t += Time.deltaTime;
-        float alpha = Mathf.Lerp(1f, 0f, t / fadeDuration);
-
-        Color c = startColor;
-        c.a = alpha;
-        mat.color = c;
-
+        startOrb.transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t / fadeDuration);
         yield return null;
     }
 
@@ -131,29 +123,8 @@ private IEnumerator FadeAndStart()
     playerRb.useGravity = true;
     playerParticle.Play();
 }
-/*
 
-    public void ActivateStartOrb()
-    {
-        if (!gameManager.isGameActive)
-        {
-            //gameManager.StartGame();
-            //playerRb.useGravity = true;
-            //playerParticle.Play();
-            orbFade.FadeAndDisable();   // fade the orb
-            StartCoroutine(StartGameDelayed());
-        }
-    }
 
-    private IEnumerator StartGameDelayed()
-    {
-        yield return new WaitForSeconds(0.5f); // delay matches fade
-
-        gameManager.StartGame();
-        playerRb.useGravity = true;
-        playerParticle.Play();
-}
-    */
 
     private void OnCollisionEnter(Collision collision) 
     {
@@ -188,7 +159,6 @@ private IEnumerator FadeAndStart()
     {
         isInvincible = true;
         audioSource.PlayOneShot(powerupSound);
-        //SendHaptics(0.5f, 0.1f);
         Debug.Log("Power-Up Activated");
 
         Powerup.SetActive(true);
@@ -237,7 +207,6 @@ private IEnumerator FadeAndStart()
         Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
         audioSource.PlayOneShot(crashSound);
         FindAnyObjectByType<WebSocketClient>()?.SendCrash();
-        //SendHaptics(0.8f, 0.2f);
         Debug.Log("Crash");
 
         yield return new WaitForSeconds(1f);
@@ -245,18 +214,4 @@ private IEnumerator FadeAndStart()
         gameManager.GameOver();
     }
 
-/*
-    private void SendHaptics(float amplitude, float duration)
-    {
-        // Try both controllers (left and right) 
-        var left = GameObject.Find("LeftHand Controller")?.GetComponent<XRBaseController>();
-        var right = GameObject.Find("RightHand Controller")?.GetComponent<XRBaseController>();
-
-        if (left != null)
-            left.SendHapticImpulse(amplitude, duration);
-
-        if (right != null)
-            right.SendHapticImpulse(amplitude, duration);
-    }
-*/
 }
